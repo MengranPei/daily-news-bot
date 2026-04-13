@@ -1,0 +1,28 @@
+name: Daily News Push
+
+on:
+  schedule:
+    - cron: "0 0 * * *"   # Runs at 08:00 Beijing time (UTC+8 = UTC 00:00)
+  workflow_dispatch:        # Also allows manual trigger from GitHub UI
+
+jobs:
+  push-news:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run news push script
+        env:
+          WECOM_WEBHOOK_URL: ${{ secrets.WECOM_WEBHOOK_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python news_push.py
